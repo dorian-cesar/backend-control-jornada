@@ -22,6 +22,8 @@ use App\Http\Middleware\CheckAccessLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\RegistroController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -127,3 +129,5 @@ Route::get('/gpsalert', [MasGPSController::class, 'getSpeedAlert']);
 Route::get('/gpsemploy', [MasGPSController::class, 'getEmployees']);
 Route::get('/gpsusers', [UserController::class, 'getAll']);
 Route::get('/gpsmarcar', [MasGPSController::class, 'getWorkHours']);
+
+Route::apiResource('/registros', RegistroController::class);
