@@ -9,7 +9,22 @@ class RegistroController extends Controller
 {
     public function index()
     {
-        $registros = Registro::all();
+        // Obtener todos los registros con la información del conductor relacionada
+        $registros = Registro::with('driver')->get();
+
+        // Formatear la respuesta para incluir solo los campos necesarios
+        $registros = $registros->map(function($registro) {
+            return [
+                'id' => $registro->id,
+                'rut' => $registro->rut,
+                'tipo' => $registro->tipo,
+                'timestamp' => $registro->timestamp,
+                'metodo' => $registro->metodo,
+                'patente' => $registro->patente,
+                'conductor' => $registro->driver ? $registro->driver->nombre : null,
+            ];
+        });
+
         return response()->json($registros);
     }
 
@@ -69,4 +84,6 @@ class RegistroController extends Controller
 
         return response()->json(null, 204);
     }
+
+
 }

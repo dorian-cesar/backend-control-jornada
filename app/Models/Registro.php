@@ -20,4 +20,9 @@ class Registro extends Model
     ];
 
     public $timestamps = true;
+
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'rut', 'rut');
+    }
 }
