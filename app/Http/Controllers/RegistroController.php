@@ -18,7 +18,7 @@ class RegistroController extends Controller
                 'id' => $registro->id,
                 'rut' => $registro->rut,
                 'tipo' => $registro->tipo,
-                'timestamp' => $registro->timestamp,
+                'created_at' => $registro->created_at,
                 'metodo' => $registro->metodo,
                 'patente' => $registro->patente,
                 'conductor' => $registro->driver ? $registro->driver->nombre : null,
