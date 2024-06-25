@@ -9,7 +9,7 @@ use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
 
-class ForgotPasswordController extends Controller
+/*class ForgotPasswordController extends Controller
 {
     public function sendResetLinkEmail(Request $request)
     {
@@ -28,5 +28,23 @@ class ForgotPasswordController extends Controller
         } else {
             return response()->json(['message'=>$status],404);
         }
+    }
+}
+    */
+
+
+class ForgotPasswordController extends Controller
+{
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => __($status)], 200)
+            : response()->json(['email' => __($status)], 400);
     }
 }

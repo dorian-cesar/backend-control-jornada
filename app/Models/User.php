@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function sendPasswordResetNotification($token): void
     {
-        $url = 'https://control-jornada-wit.netlify.app/reset/'.$token;
+        $url = 'http://localhost/forgot-pasw/reset-password.html?token='.$token;
     
         $this->notify(new PasswordReset($url));
     }

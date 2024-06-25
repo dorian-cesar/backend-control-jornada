@@ -1,0 +1,3 @@
+Mail::raw('Test de Correo', function ($message) {
+    $message->to('dgonzalez@wit.la')->subject('Test Email');
+});

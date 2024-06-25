@@ -11,6 +11,7 @@ class PasswordReset extends Notification
 {
     use Queueable;
     protected $url;
+    protected $token;
 
     /**
      * Create a new notification instance.
@@ -35,6 +36,8 @@ class PasswordReset extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        echo 
+        $tok = $this->token;
         return (new MailMessage)
             ->subject('Reestablecer Contraseña')
             ->greeting('Hola!')
