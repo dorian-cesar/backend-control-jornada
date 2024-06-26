@@ -45,7 +45,9 @@ Route::post('/login', [AuthController::class,'login']);
 Route::post('/logout', [AuthController::class,'logout']);
 
 Route::post('/password/email', [ForgotPasswordController::class,'sendResetLinkEmail']);
-Route::post('/password/reset', [ResetPasswordController::class,'reset'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset']);
+
+//Route::post('/password/reset', [ResetPasswordController::class,'reset'])->name('password.reset'); 
 /*
 // Temporal
 Route::apiResource('/conductores', DriverController::class);
