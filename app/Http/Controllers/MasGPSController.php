@@ -82,6 +82,20 @@ class MasGPSController extends Controller
 
     }
 
+    public function getList(){
+        $hash = $this->getHash();
+        if(isset($hash['success'])){
+            $trackers = Http::post('http://www.trackermasgps.com/api-v2/tracker/list',[
+                'hash' => $hash['hash']
+            ])->json('list');
+
+            return $trackers;
+
+        }
+
+
+    }
+
     public function getSpeedAlert(Request $request){
         $hash = $this->getHash();
 

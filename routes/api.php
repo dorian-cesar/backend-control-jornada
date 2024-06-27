@@ -132,6 +132,7 @@ Route::get('/gpsalert', [MasGPSController::class, 'getSpeedAlert']);
 Route::get('/gpsemploy', [MasGPSController::class, 'getEmployees']);
 Route::get('/gpsusers', [UserController::class, 'getAll']);
 Route::get('/gpsmarcar', [MasGPSController::class, 'getWorkHours']);
+Route::get('/gpslist', [MasGPSController::class, 'getList']);
 
 Route::apiResource('/registros', RegistroController::class);
 
