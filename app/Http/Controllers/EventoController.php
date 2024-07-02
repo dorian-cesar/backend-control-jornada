@@ -9,7 +9,7 @@ class EventoController extends Controller
 {
     // URLs de las APIs
     private $apiUrlEventos = 'https://control-jornada.wit.la/backend-control-jornada/public/api/gpsalert';
-    private $apiUrlConductores = 'http://localhost/backend-control-jornada/public/api/entradassalidas';
+    private $apiUrlConductores = 'https://control-jornada.wit.la/backend-control-jornada/public/api/entradassalidas';
 
     public function obtenerEventos()
     {
