@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Registro;
+use Illuminate\Support\Facades\DB;
 
 class RegistroController extends Controller
 {
@@ -13,7 +14,7 @@ class RegistroController extends Controller
         $registros = Registro::with('driver')->get();
 
         // Formatear la respuesta para incluir solo los campos necesarios
-        $registros = $registros->map(function($registro) {
+        $registros = $registros->map(function ($registro) {
             return [
                 'id' => $registro->id,
                 'rut' => $registro->rut,
@@ -37,13 +38,13 @@ class RegistroController extends Controller
             'patente' => 'required|string|max:10',
         ]);
 
-         // Obtener el último registro del mismo RUT
-         $lastRecord = Registro::where('rut', $request->rut)->orderBy('created_at', 'desc')->first();
+        // Obtener el último registro del mismo RUT
+        $lastRecord = Registro::where('rut', $request->rut)->orderBy('created_at', 'desc')->first();
 
-         // Comprobar si el último registro es del mismo tipo (entrada o salida)
-         if ($lastRecord && $lastRecord->tipo == $request->tipo) {
-             return response()->json(['error' => 'No pueden existir dos registros consecutivos del mismo tipo para el mismo RUT.'], 422);
-         }
+        // Comprobar si el último registro es del mismo tipo (entrada o salida)
+        if ($lastRecord && $lastRecord->tipo == $request->tipo) {
+            return response()->json(['error' => 'No pueden existir dos registros consecutivos del mismo tipo para el mismo RUT.'], 422);
+        }
 
         $registro = Registro::create([
             'rut' => $request->rut,
@@ -85,5 +86,64 @@ class RegistroController extends Controller
         return response()->json(null, 204);
     }
 
+    public function getEntradaSalidas()
+    {
+        $sql="
+            WITH ordered_records AS (
+  SELECT
+    rut,
+    created_at,
+    DATE(created_at) AS work_date,
+    patente,
+    tipo,
+    metodo,
+  
+    LAG(created_at) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_created_at,
+    LAG(tipo) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_tipo
+  FROM
+    registros
+),
+time_differences AS (
+  SELECT
+    rut,
+    work_date,
+    patente,
+    previous_created_at AS entrada,
+    created_at AS salida,
+    CASE 
+      WHEN tipo = 'salida' AND previous_tipo = 'entrada' THEN
+        TIMESTAMPDIFF(MINUTE, previous_created_at, created_at)
+      ELSE 0
+    END AS diferencia_minutos
+  FROM
+    ordered_records
+)
+SELECT
+  td.rut,
+  td.work_date,
+  td.patente,
+  MIN(td.entrada) AS primera_entrada,
+  MAX(td.salida) AS ultima_salida,
+  SUM(td.diferencia_minutos) AS total_minutos,
+  d.nombre AS nombre_conductor
+FROM
+  time_differences td
+LEFT JOIN
+  drivers d ON td.rut = d.rut
 
+GROUP BY
+  td.rut,
+  td.work_date,
+  td.patente,
+  d.nombre
+ORDER BY
+  td.rut,
+  td.work_date,
+  td.patente;
+        ";
+
+        $results = DB::select($sql);
+
+        return response()->json($results);
+    }
 }

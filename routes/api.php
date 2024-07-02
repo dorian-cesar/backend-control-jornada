@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\PasswordController;
 
+use App\Http\Controllers\EventoController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -135,5 +137,8 @@ Route::get('/gpsmarcar', [MasGPSController::class, 'getWorkHours']);
 Route::get('/gpslist', [MasGPSController::class, 'getList']);
 
 Route::apiResource('/registros', RegistroController::class);
+Route::get('/entradassalidas', [RegistroController::class,'getEntradaSalidas']);
 
 Route::middleware('auth:sanctum')->post('password/update', [PasswordController::class, 'update']);
+
+Route::get('/eventos', [EventoController::class, 'obtenerEventos']);
