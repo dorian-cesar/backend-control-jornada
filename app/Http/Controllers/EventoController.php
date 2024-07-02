@@ -32,6 +32,7 @@ class EventoController extends Controller
 
                         if ($evento['start_time'] >= $time1 && $evento['start_time'] <= $time2) {
                             $resultado[] = [
+                                'id_tracker'=>$evento['id_tracker'],
                                 'patente' => $evento['patente'],
                                 'velocidad' => $evento['speed'],
                                 'conductor' => $conductor['nombre_conductor'],
@@ -50,6 +51,7 @@ class EventoController extends Controller
             }
             if (!$coincidenciaEncontrada) {
                 $resultado[] = [
+                    'id_tracker'=>$evento['id_tracker'],
                     'patente' => $evento['patente'],
                     'velocidad' => $evento['speed'],
                     'conductor' => 'No identificado',
