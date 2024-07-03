@@ -167,4 +167,17 @@ class DriverController extends Controller
         Driver::where('id',$id)->first()->delete();
         return response()->json(null, 204);
     }
+
+    public function getNameByRut($rut)
+    {
+        // Buscar el registro por RUT
+        $drive = Driver::where('rut', $rut)->first();
+
+        // Verificar si se encontró un registro
+        if ($drive) {
+            return response()->json(['nombre' => $drive->nombre], 200);
+        } else {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        }
+    }
 }

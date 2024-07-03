@@ -142,3 +142,5 @@ Route::get('/entradassalidas', [RegistroController::class,'getEntradaSalidas']);
 Route::middleware('auth:sanctum')->post('password/update', [PasswordController::class, 'update']);
 
 Route::get('/eventos', [EventoController::class, 'obtenerEventos']);
+
+Route::get('/driver/name/{rut}', [DriverController::class, 'getNameByRut']);
