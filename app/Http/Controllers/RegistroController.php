@@ -15,11 +15,13 @@ class RegistroController extends Controller
 
         // Formatear la respuesta para incluir solo los campos necesarios
         $registros = $registros->map(function ($registro) {
+
+            $fechaString=str_replace('/', '-', $registro->created_at);
             return [
                 'id' => $registro->id,
                 'rut' => $registro->rut,
                 'tipo' => $registro->tipo,
-                'created_at' => $registro->created_at,
+                'created_at' => $fechaString,
                 'metodo' => $registro->metodo,
                 'patente' => $registro->patente,
                 'conductor' => $registro->driver ? $registro->driver->nombre : null,
