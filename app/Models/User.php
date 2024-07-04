@@ -50,7 +50,7 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
        
-        $url = 'http://localhost/control_jornada-main/reset.html?token='.$token;
+        $url = 'https://interurbano.wit.la/control-jornada-html/reset.html?token='.$token;
     
         $this->notify(new PasswordReset($url));
     }
