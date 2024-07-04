@@ -15,8 +15,7 @@ class RegistroController extends Controller
 
         // Formatear la respuesta para incluir solo los campos necesarios
         $registros = $registros->map(function ($registro) {
-
-            $fechaString=str_replace('/', '-', $registro->created_at);
+            $fechaString = str_replace('/', '-', $registro->created_at);
             return [
                 'id' => $registro->id,
                 'rut' => $registro->rut,
@@ -90,62 +89,90 @@ class RegistroController extends Controller
 
     public function getEntradaSalidas()
     {
-        $sql="
+        $sql = "
             WITH ordered_records AS (
-  SELECT
-    rut,
-    created_at,
-    DATE(created_at) AS work_date,
-    patente,
-    tipo,
-    metodo,
-  
-    LAG(created_at) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_created_at,
-    LAG(tipo) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_tipo
-  FROM
-    registros
-),
-time_differences AS (
-  SELECT
-    rut,
-    work_date,
-    patente,
-    previous_created_at AS entrada,
-    created_at AS salida,
-    CASE 
-      WHEN tipo = 'salida' AND previous_tipo = 'entrada' THEN
-        TIMESTAMPDIFF(MINUTE, previous_created_at, created_at)
-      ELSE 0
-    END AS diferencia_minutos
-  FROM
-    ordered_records
-)
-SELECT
-  td.rut,
-  td.work_date,
-  td.patente,
-  MIN(td.entrada) AS primera_entrada,
-  MAX(td.salida) AS ultima_salida,
-  SUM(td.diferencia_minutos) AS total_minutos,
-  d.nombre AS nombre_conductor
-FROM
-  time_differences td
-LEFT JOIN
-  drivers d ON td.rut = d.rut
-
-GROUP BY
-  td.rut,
-  td.work_date,
-  td.patente,
-  d.nombre
-ORDER BY
-  td.rut,
-  td.work_date,
-  td.patente;
+                SELECT
+                    rut,
+                    created_at,
+                    DATE(created_at) AS work_date,
+                    patente,
+                    tipo,
+                    metodo,
+                    LAG(created_at) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_created_at,
+                    LAG(tipo) OVER (PARTITION BY rut, patente ORDER BY created_at) AS previous_tipo
+                FROM
+                    registros
+            ),
+            time_differences AS (
+                SELECT
+                    rut,
+                    work_date,
+                    patente,
+                    previous_created_at AS entrada,
+                    created_at AS salida,
+                    CASE 
+                        WHEN tipo = 'salida' AND previous_tipo = 'entrada' THEN
+                            TIMESTAMPDIFF(MINUTE, previous_created_at, created_at)
+                        ELSE 0
+                    END AS diferencia_minutos
+                FROM
+                    ordered_records
+            )
+            SELECT
+                td.rut,
+                td.work_date,
+                td.patente,
+                MIN(td.entrada) AS primera_entrada,
+                MAX(td.salida) AS ultima_salida,
+                SUM(td.diferencia_minutos) AS total_minutos,
+                d.nombre AS nombre_conductor
+            FROM
+                time_differences td
+            LEFT JOIN
+                drivers d ON td.rut = d.rut
+            GROUP BY
+                td.rut,
+                td.work_date,
+                td.patente,
+                d.nombre
+            ORDER BY
+                td.rut,
+                td.work_date,
+                td.patente;
         ";
 
         $results = DB::select($sql);
 
         return response()->json($results);
+    }
+
+    public function getEventosEntreFechas(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+      
+        $start_date = $request->start_date . ' 00:00:00';
+        $end_date = $request->end_date . ' 23:59:59';
+
+        $sql = "
+            SELECT 
+            r.*, 
+            d.nombre AS nombre_conductor
+        FROM 
+            registros r
+        LEFT JOIN 
+            drivers d ON r.rut = d.rut
+        WHERE 
+            r.created_at BETWEEN ? AND ?
+        ORDER BY 
+            r.created_at ASC
+        ";
+
+        $events = DB::select($sql, [$start_date, $end_date]);
+
+        return response()->json($events);
     }
 }

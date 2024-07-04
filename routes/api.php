@@ -144,3 +144,5 @@ Route::middleware('auth:sanctum')->post('password/update', [PasswordController::
 Route::get('/eventos', [EventoController::class, 'obtenerEventos']);
 
 Route::get('/driver/name/{rut}', [DriverController::class, 'getNameByRut']);
+
+Route::get('/eventos-entre-fechas', [RegistroController::class, 'getEventosEntreFechas']);
