@@ -315,7 +315,7 @@ class MasGPSController extends Controller
                 ])->throw();
 
                 $data = $retrieve->json();
-
+/*
                 $driverdata = Http::get('http://www.trackermasgps.com/api-v2/tracker/employee/read',[
                     'hash' => $hash['hash'],
                     'tracker_id' => $idforlabel
@@ -327,7 +327,7 @@ class MasGPSController extends Controller
                     // Merge the driver data into $data
                     $data['driver'] = $driver;
                 }
-
+                        */
                 return $data;
             }
 
